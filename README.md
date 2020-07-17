@@ -55,7 +55,7 @@
 #### 파일은 PHP 코드에 BOM없이 UTF-8 만 사용해야합니다. (필수)
 
 #### 네임 스페이스와 클래스는 반드시 "autoloading" PSR [ PSR-0 , PSR-4 ]을 따라야합니다.
- * PHP 5.3 및 이후 버전 용으로 작성된 코드는 정식 네임 스페이스를 사용해야합니다.
+ * 작성된 코드는 정식 네임 스페이스를 사용해야합니다.
 
 예제:
 
@@ -68,37 +68,42 @@ class Foo
 {
 }
 ```
- * php ver.5.2.x 로 작성된 코드는 클래스 이름에 Vendor_ 접두어의 의사 네임 스페이스 규칙을 사용해야합니다.
 
-예제 :
+#### 클래스 이름은 반드시 PascalCase를 따라야 한다. 클래스 이름과 클래스 파일명은 같아야 한다.
+
+나쁜 예: 💩
 
 ```php
-<?php
-// PHP 5.2.x and earlier:
-class Vendor_Model_Foo
+class User_Controller
 {
+   ...
 }
 ```
-#### 클래스 이름은 반드시 PascalCase를 따라야 한다. 
 
-예제 : 
+좋은 예: 👍
 
 ```php
-<?php
-class UserName
+class UserController
 {
    ...
 }
 ```
 #### 클래스 상수는 모두 대문자로 밑줄 구분 기호로 선언해야합니다. 
 
-예제 : 
+나쁜 예: 💩
 
 ```php
 <?php
-namespace Vendor\Model;
+class UserController
+{
+    const version = '1.0';
+}
+```
+좋은 예: 👍
 
-class UserName
+```php
+<?php
+class UserController
 {
     const VERSION = '1.0';
     const DATE_APPROVED = '2012-06-01';
@@ -456,11 +461,12 @@ if ($expr1) {
 
 ## Laravel
 
+[🔝 목차로 돌아가기](#contents)
 ### **단일 책임 원칙**
 
 클래스와 메서드는 하나의 책임만 있어야 합니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function getFullNameAttribute()
@@ -473,7 +479,7 @@ public function getFullNameAttribute()
 }
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function getFullNameAttribute()
@@ -505,7 +511,7 @@ public function getFullNameShort()
 
 DB와 관련된 로직은 Eloquent 모델이나 Repository 클래스에 작성되어야 합니다. 
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function index()
@@ -520,7 +526,7 @@ public function index()
 }
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function index()
@@ -547,7 +553,7 @@ class Client extends Model
 
 유효성 검사 로직을 컨트롤러에서 Request 클래스로 옮깁니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function store(Request $request)
@@ -562,7 +568,7 @@ public function store(Request $request)
 }
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function store(PostRequest $request)
@@ -590,7 +596,7 @@ class PostRequest extends Request
 컨트롤러는 하나의 책임만 가지기 때문에 비즈니스 로직은 서비스 클래스에 있어야 합니다.
 
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function store(Request $request)
@@ -603,7 +609,7 @@ public function store(Request $request)
 }
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function store(Request $request)
@@ -630,7 +636,7 @@ class ArticleService
 
 코드를 재사용합니다. 단일 책임 원칙뿐만 아니라 블레이드 템플릿, Eloquent 스코프 등은 코드의 중복을 피할 수 있도록 도와줍니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function getActive()
@@ -646,7 +652,7 @@ public function getArticles()
 }
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function scopeActive($q)
@@ -673,7 +679,7 @@ public function getArticles()
 
 Eloquent를 사용하면 읽기 쉽고 유지 보수할 수 있는 코드를 작성할 수 있습니다. Eloquent는 소프트 삭제, 이벤트, 스코프 등 좋은 기능이 있습니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 
 ```sql
@@ -691,7 +697,7 @@ AND `active` = '1'
 ORDER BY `created_at` DESC
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 Article::has('user.profile')->verified()->latest()->get();
@@ -701,7 +707,7 @@ Article::has('user.profile')->verified()->latest()->get();
 
 ### **Mass assignment-대량 할당**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 $article = new Article;
@@ -713,7 +719,7 @@ $article->category_id = $category->id;
 $article->save();
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 $category->article()->create($request->all());
@@ -723,7 +729,7 @@ $category->article()->create($request->all());
 
 ### **블레이드 템플릿에서 쿼리를 실행하지 않습니다. 그리고 즉시 로딩을 사용합니다.(N + 1 문제)**
 
-나쁜예 (유저 전체를 가져오는 쿼리(1번) + 해당 유저의 프로필을 가져오는 쿼리(100번) = 101번 실행):
+나쁜예 (유저 전체를 가져오는 쿼리(1번) + 해당 유저의 프로필을 가져오는 쿼리(100번) = 101번 실행): 💩
 
 ```php
 @foreach (User::all() as $user)
@@ -747,7 +753,7 @@ $users = User::with('profile')->get();
 
 ### **코드에 주석을 작성합니다. 하지만 주석보다 의미있는 메서드 이름과 변수 이름을 사용하는 것이 더 좋습니다.**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 if (count((array) $builder->getQuery()->joins) > 0)
@@ -760,7 +766,7 @@ if (count((array) $builder->getQuery()->joins) > 0)
 if (count((array) $builder->getQuery()->joins) > 0)
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 if ($this->hasJoins())
@@ -770,7 +776,7 @@ if ($this->hasJoins())
 
 ### **블레이드 템플릿에 JS와 CSS를 작성하지 않고 PHP 클래스에 HTML을 작성하지 않습니다.**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 let article = `{{ json_encode($article) }}`;
@@ -798,7 +804,7 @@ The best way is to use specialized PHP to JS package to transfer the data.
 
 ### **코드에 텍스트로 작성하지 않고, 설정 파일, 언어 파일, 상수 등을 사용합니다.**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 public function isNormal()
@@ -809,7 +815,7 @@ public function isNormal()
 return back()->with('message', 'Your article has been added!');
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function isNormal()
@@ -887,14 +893,14 @@ Trait | adjective | Notifiable | ~~NotificationTrait~~
 
 ### **될 수 있으면 짧고 읽기 쉬운 문법을 사용합니다.**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 $request->session()->get('cart');
 $request->input('name');
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 session('cart');
@@ -928,14 +934,14 @@ Common syntax | Shorter and more readable syntax
 
 new Class 문법은 클래스 간의 결합도를 높이고 테스트를 복잡하게 만듭니다. new Class 문법 대신에 IoC 컨테이너 또는 파사드를 사용합니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 $user = new User;
 $user->create($request->all());
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 public function __construct(User $user)
@@ -954,13 +960,13 @@ $this->user->create($request->all());
 
 데이터를 설정 파일에 전달한 다음 `config()` helper 함수를 통해 애플리케이션에서 데이터를 사용합니다.
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 $apiKey = env('API_KEY');
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 // config/api.php
@@ -974,14 +980,14 @@ $apiKey = config('api.key');
 
 ### **날짜를 표준 형식으로 저장합니다. accessors(get), mutators(set)을 사용해 날짜 형식을 수정합니다.**
 
-나쁜 예:
+나쁜 예: 💩
 
 ```php
 {{ Carbon::createFromFormat('Y-d-m H-i', $object->ordered_at)->toDateString() }}
 {{ Carbon::createFromFormat('Y-d-m H-i', $object->ordered_at)->format('m-d') }}
 ```
 
-좋은 예:
+좋은 예: 👍
 
 ```php
 // Model
